@@ -1,12 +1,12 @@
 const gameBoard = (function() {
     const board = [null, null, null, null, null, null, null, null, null];
-    const displayBoard = function() {
+    const getBoard = function() {
         return board;
     };
 
     return {
         board,
-        displayBoard, 
+        getBoard, 
     };
 })();
 
@@ -15,12 +15,12 @@ const player = function(name) {
 };
 
 const game = (function() {
-    const turn = 'player1';
+    let turn = 1;
     const changeTurn = function() {
-        turn === 'player1' ? turn = 'player2' : turn = 'player1';
+        turn === 1 ? turn++ : turn--;
     }
     const gameOver = function() {
-        if (!gameBoard.displayBoard().includes(null)) {
+        if (!gameBoard.getBoard().includes(null)) {
             return true;
         } else {
             return false;
@@ -28,31 +28,45 @@ const game = (function() {
     };
     const addX = function(index) {
         gameBoard.board.splice(index, 1, 'X');
+        playTurn();
     };
     const addO = function(index) {
         gameBoard.board.splice(index, 1, 'O');
+        playTurn();
     };
-    const gameWin = function() {
-        let board = gameBoard.displayBoard()
-        let searchWin = function(a, b, c) {
-            return board[a] === board[b] === board[c];
+    const searchBoard = function(a, b, c) {
+        let board = gameBoard.getBoard()
+        let boardSearch = board[a] + board[b] + board[c];
+        if (typeof boardSearch == 'string') {
+            if (board[a] === board[b] && board[b] === board[c]) {
+                return ((a.toString() + b + c) + ' ' + boardSearch);
+            } else {
+                return false;
+            };
         }
-        if (searchWin(0, 1, 2) || searchWin(0,3,6) || searchWin(0,4,8) || searchWin(1,4,7) || searchWin(2,5,8) || searchWin(2,4,6) || searchWin(3,4,5) || searchWin(6,7,8)) {
-            if (searchWin(a, b, c) === 'XXX') {
+    }
+    const checkGameWin = function() {
+        let won = (searchBoard(0,1,2) || searchBoard(0,3,6) || searchBoard(0,4,8) || searchBoard(1,4,7) || searchBoard(2,5,8) || searchBoard(2,4,6) || searchBoard(3,4,5) || searchBoard(6,7,8)) 
+        if (won) {
+            if (won.includes('XXX')) {
+                console.log('x won')
                 return 'X wins';
-            } else if (searchWin(a, b, c) === 'OOO') {
+            } else if (won.includes('OOO')) {
+                console.log('o won')
                 return 'O wins';
             };
         } else {
             return false;
         };
     }
+    const playTurn = function() {
+        gameOver();
+        checkGameWin();
+    }
 
     return {
-        changeTurn,
-        gameOver,
-        gameWin,
         addX,
         addO,
+        checkGameWin,
     }
 })()
